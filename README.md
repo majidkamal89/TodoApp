@@ -16,6 +16,12 @@ Clone this repo and go to your project directory, open CMD terminal and run belo
 
 It will download all dependencies.
 
+#.env Configuration
+
+Open .env file and set your database credentials then run this command in terminal create database tables
+
+* php artisan migrate
+
 # Start Local Server
 
 To start server run command
