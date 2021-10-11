@@ -16,11 +16,21 @@ class Todo extends Model
     const T_SNOOZED = 1;
     const T_COMPLETED = 2;
     const T_OVERDUE = 3;
-    const PER_PAGE = 2;
+    const PER_PAGE = 10;
 
     public function scopeUserTask($query, $userid, $id)
     {
         return $query->where('user_id', $userid)->where('id', $id);
+    }
+
+    public function scopeTaskByDate($query, $userid, $date)
+    {
+        return $query->where('user_id', $userid)->whereDay('date_time', '=', $date);
+    }
+
+    public function scopeTaskByMonth($query, $userid, $month)
+    {
+        return $query->where('user_id', $userid)->whereMonth('date_time', '=', $month);
     }
 
     public function category(){

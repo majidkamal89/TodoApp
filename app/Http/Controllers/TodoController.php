@@ -6,6 +6,7 @@ use App\Category;
 use App\Helpers\ApiHelper;
 use App\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -13,12 +14,25 @@ class TodoController extends Controller
 {
     /**
      * Load all Task of LoggedIn User.
+     *
+     * @param  \Illuminate\Http\Request  $request
      * @return  mixed
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Todo::with(['category'])->where('user_id', auth()->user()->id)
-            ->select(['id','name','description','date_time','category_id','status'])->latest()->paginate(Todo::PER_PAGE);
+        if(!empty($request->type) && in_array($request->type, ['day','month']) && !empty($request->search)){
+            $function = ($request->type == 'day') ? 'TaskByDate':'TaskByMonth';
+            $data = Todo::with(['category'])->$function(auth()->user()->id,$request->search)
+                ->orderBy('date_time', 'DESC')
+                ->select(['id','name','description','date_time','category_id','status'])
+                ->latest()->paginate(Todo::PER_PAGE);
+        } else {
+            $data = Todo::with(['category'])->where('user_id', auth()->user()->id)
+                ->orderBy('date_time', 'DESC')
+                ->select(['id','name','description','date_time','category_id','status'])
+                ->latest()->paginate(Todo::PER_PAGE);
+        }
+
         $tasks = ApiHelper::filterData($data);
         return ApiHelper::GenerateApiResponse(true, 200, 'success', $tasks);
     }
